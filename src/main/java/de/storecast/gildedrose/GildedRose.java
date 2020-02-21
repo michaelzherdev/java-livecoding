@@ -1,21 +1,18 @@
 package de.storecast.gildedrose;
 
+import de.storecast.gildedrose.command.*;
+
 class GildedRose {
-    Item[] items;
+    private final Item[] items;
 
-    public static final String AGED_BRIE = "Aged Brie";
-    public static final String BACKSTAGE_PASSES_TO_CONCERT = "Backstage passes to a TAFKAL80ETC concert";
-    public static final String SULFURAS = "Sulfuras, Hand of Ragnaros";
-    public static final String CONJURED = "Conjured";
-
-    public static final int MAX_QUALITY = 50;
-    public static final int SULFURAS_QUALITY = 80;
+    static final String AGED_BRIE = "Aged Brie";
+    static final String BACKSTAGE_PASSES_TO_CONCERT = "Backstage passes to a TAFKAL80ETC concert";
+    static final String SULFURAS = "Sulfuras, Hand of Ragnaros";
+    static final String CONJURED = "Conjured";
 
     public GildedRose(Item[] items) {
         this.items = items;
     }
-
-    public GildedRose() {}
 
     public Item[] getItems() {
         return items;
@@ -23,62 +20,25 @@ class GildedRose {
 
     public void updateQuality() {
         for (Item item : items) {
-            String itemName = item.name;
-            // We dont's need to modify SULFURAS, just check that quality is 80
-            if(itemName.equals(SULFURAS)) {
-                if(item.quality != SULFURAS_QUALITY) {
-                    throw new IllegalArgumentException("Sulfuras quality should be 80!");
-                }
-            } else {
-                item.sellIn--;
-                if (itemName.equals(AGED_BRIE)) {
-                    incrementQuality(item);
-                } else if (itemName.equals(BACKSTAGE_PASSES_TO_CONCERT)) {
-                    processBackstagePassedToConcert(item);
-                } else {
-                    decrementQuality(item);
-                }
+            final String itemName = item.name;
+            Command command;
+            switch (itemName) {
+                case SULFURAS:
+                    command = new SulfurasCommand();
+                    break;
+                case AGED_BRIE:
+                    command = new AgedBrieCommand();
+                    break;
+                case BACKSTAGE_PASSES_TO_CONCERT:
+                    command = new BackStageCommand();
+                    break;
+                case CONJURED:
+                    command = new ConjuredCommand();
+                    break;
+                default:
+                    command = new DefaultCommand();
             }
-        }
-    }
-
-    /**
-     * Contains logic for 'Backstage passes to a TAFKAL80ETC concert' processing
-     * @param item
-     */
-    private void processBackstagePassedToConcert(Item item) {
-        if (item.sellIn < 0) {
-            item.quality = 0;
-        } else {
-            incrementQuality(item);
-            if (item.sellIn < 10) incrementQuality(item);
-            if (item.sellIn < 5) incrementQuality(item);
-        }
-    }
-
-    /**
-     * Increments quality if it's possible
-     * @param item
-     */
-    private void incrementQuality(Item item) {
-        if (item.quality < MAX_QUALITY) {
-            item.quality++;
-            if (item.quality < MAX_QUALITY && item.sellIn < 0) {
-                item.quality++;
-            }
-        }
-    }
-
-    /**
-     * Decrements quality if it's possible
-     * @param item
-     */
-    private void decrementQuality(Item item) {
-        if(item.quality > 0) {
-            item.quality--;
-            if (item.quality > 0 && item.sellIn < 0) {
-                item.quality--;
-            }
+            command.execute(item);
         }
     }
 }

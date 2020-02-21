@@ -1,5 +1,6 @@
 package de.storecast.gildedrose;
 
+import de.storecast.gildedrose.command.SulfurasCommand;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -74,11 +75,11 @@ public class GildedRoseTest {
 
     @Test
     public void testUpdateQualitySulfuras() {
-        GildedRose gildedRose = new GildedRose(new Item[]{new Item(GildedRose.SULFURAS,5, GildedRose.SULFURAS_QUALITY)});
+        GildedRose gildedRose = new GildedRose(new Item[]{new Item(GildedRose.SULFURAS,5, SulfurasCommand.SULFURAS_QUALITY)});
         for(int i = 0; i < 3; i++) {
             gildedRose.updateQuality();
             Assert.assertEquals(5, gildedRose.getItems()[0].sellIn);
-            Assert.assertEquals(GildedRose.SULFURAS_QUALITY, gildedRose.getItems()[0].quality);
+            Assert.assertEquals(SulfurasCommand.SULFURAS_QUALITY, gildedRose.getItems()[0].quality);
         }
 
     }
@@ -109,7 +110,6 @@ public class GildedRoseTest {
         Assert.assertEquals(0, gildedRose.getItems()[0].quality);
     }
 
-    @Ignore
     @Test
     public void testUpdateQualityConjured() {
         GildedRose gildedRose = new GildedRose(new Item[]{new Item(GildedRose.CONJURED,2,4)});
